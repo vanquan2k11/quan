@@ -140,8 +140,8 @@ getgenv().Team = "Marines"
 loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() 
 end})
 
-Tabs.Main1:AddButton({Title="CokkaHub",Callback=function()
-    loadstring(game:HttpGet"https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua")()
+Tabs.Main1:AddButton({Title="BaconHub",Callback=function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="Vxezehub",Callback=function()
