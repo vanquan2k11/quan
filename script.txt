@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
 -- ===== KEY VERIFICATION SYSTEM =====
@@ -16,7 +17,7 @@ local keyFrame = Instance.new("Frame")
 keyFrame.Parent = keyGui
 keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 keyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-keyFrame.Size = UDim2.new(0, 400, 0, 200)
+keyFrame.Size = UDim2.new(0, 500, 0, 280)  -- Expanded size
 keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 keyFrame.BorderSizePixel = 0
 
@@ -24,7 +25,7 @@ local UICornerKey = Instance.new("UICorner")
 UICornerKey.Parent = keyFrame
 UICornerKey.CornerRadius = UDim.new(0, 15)
 
--- ===== BACKGROUND IMAGE =====
+-- ===== BACKGROUND IMAGE WITH RAINBOW BORDER =====
 local bgImage = Instance.new("ImageLabel")
 bgImage.Name = "Background"
 bgImage.Parent = keyFrame
@@ -41,8 +42,8 @@ bgCorner.CornerRadius = UDim.new(0, 15)
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Parent = keyFrame
-titleLabel.Position = UDim2.new(0, 0, 0, 10)
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.Position = UDim2.new(0, 0, 0, 15)
+titleLabel.Size = UDim2.new(1, 0, 0, 50)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Key free"
 titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
@@ -52,8 +53,8 @@ titleLabel.ZIndex = 2
 
 local keyInput = Instance.new("TextBox")
 keyInput.Parent = keyFrame
-keyInput.Position = UDim2.new(0.1, 0, 0.35, 0)
-keyInput.Size = UDim2.new(0.8, 0, 0.35, 0)
+keyInput.Position = UDim2.new(0.05, 0, 0.35, 0)
+keyInput.Size = UDim2.new(0.9, 0, 0.4, 0)
 keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 keyInput.BorderSizePixel = 0
 keyInput.Text = ""
@@ -72,8 +73,8 @@ UICornerInput.CornerRadius = UDim.new(0, 10)
 
 local submitBtn = Instance.new("TextButton")
 submitBtn.Parent = keyFrame
-submitBtn.Position = UDim2.new(0.1, 0, 0.8, 0)
-submitBtn.Size = UDim2.new(0.35, 0, 0.15, 0)
+submitBtn.Position = UDim2.new(0.05, 0, 0.83, 0)
+submitBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
 submitBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
 submitBtn.BorderSizePixel = 0
 submitBtn.Text = "Xác Nhận"
@@ -88,8 +89,8 @@ UICornerSubmit.CornerRadius = UDim.new(0, 10)
 
 local closeBtn = Instance.new("TextButton")
 closeBtn.Parent = keyFrame
-closeBtn.Position = UDim2.new(0.55, 0, 0.8, 0)
-closeBtn.Size = UDim2.new(0.35, 0, 0.15, 0)
+closeBtn.Position = UDim2.new(0.55, 0, 0.83, 0)
+closeBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 closeBtn.BorderSizePixel = 0
 closeBtn.Text = "Thoát"
@@ -104,7 +105,7 @@ UICornerClose.CornerRadius = UDim.new(0, 10)
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Parent = keyFrame
-statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+statusLabel.Position = UDim2.new(0, 0, 0.75, 0)
 statusLabel.Size = UDim2.new(1, 0, 0, 20)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = ""
@@ -113,12 +114,61 @@ statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextScaled = true
 statusLabel.ZIndex = 2
 
+-- Rainbow colors for key frame
+local rainbowColorsKey = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+-- Rainbow effect on key frame border
+local keyFrameConnection
+keyFrameConnection = RunService.Heartbeat:Connect(function()
+    if keyFrame and keyFrame.Parent then
+        local colorIndex = math.floor(tick() / 0.3) % 7 + 1
+        keyFrame.BorderColor3 = rainbowColorsKey[colorIndex]
+        keyFrame.BorderSizePixel = 2
+    end
+end)
+
+-- Make key frame draggable
+local dragging = false
+local dragStart = Vector2.new(0, 0)
+
+keyFrame.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+    end
+end)
+
+keyFrame.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input, gameProcessed)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        keyFrame.Position = keyFrame.Position + UDim2.fromOffset(delta.X, delta.Y)
+        dragStart = input.Position
+    end
+end)
+
 submitBtn.MouseButton1Down:Connect(function()
     if keyInput.Text == correctKey then
         keyVerified = true
         statusLabel.Text = "✓ Key chính xác!"
         statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
         task.wait(1)
+        if keyFrameConnection then
+            keyFrameConnection:Disconnect()
+        end
         keyGui:Destroy()
     else
         statusLabel.Text = "✗ Key không chính xác!"
@@ -129,6 +179,9 @@ submitBtn.MouseButton1Down:Connect(function()
 end)
 
 closeBtn.MouseButton1Down:Connect(function()
+    if keyFrameConnection then
+        keyFrameConnection:Disconnect()
+    end
     keyGui:Destroy()
     game:Shutdown()
 end)
@@ -144,13 +197,13 @@ repeat task.wait() until keyVerified
 
 -- ===== RAINBOW RAIN EFFECT AFTER KEY VERIFICATION =====
 local rainbowColors = {
-    Color3.fromRGB(255, 0, 0),      -- Red
-    Color3.fromRGB(255, 127, 0),    -- Orange
-    Color3.fromRGB(255, 255, 0),    -- Yellow
-    Color3.fromRGB(0, 255, 0),      -- Green
-    Color3.fromRGB(0, 0, 255),      -- Blue
-    Color3.fromRGB(75, 0, 130),     -- Indigo
-    Color3.fromRGB(148, 0, 211)     -- Violet
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
 }
 
 local function createRainDrop(colorIndex)
@@ -171,7 +224,6 @@ local function createRainDrop(colorIndex)
     
     raindrop.Parent = workspace
     
-    -- Tween the raindrop down
     local tween = TweenService:Create(
         raindrop,
         TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
@@ -179,15 +231,13 @@ local function createRainDrop(colorIndex)
     )
     tween:Play()
     
-    -- Remove after reaching bottom
     game:GetService("Debris"):AddItem(raindrop, 3.5)
 end
 
--- Rain effect - continuous for 8 seconds
 local rainStartTime = tick()
 local colorRotation = 1
 while tick() - rainStartTime < 8 do
-    for i = 1, 15 do -- Create 15 raindrops per cycle
+    for i = 1, 15 do
         createRainDrop(colorRotation)
         colorRotation = colorRotation % 7 + 1
     end
@@ -215,7 +265,6 @@ msg.TextStrokeTransparency = 0
 msg.TextStrokeColor3 = Color3.fromRGB(0,0,0)
 msg.TextTransparency = 1
 
--- Firework function
 local function createFirework()
     if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
     local part = Instance.new("Part")
@@ -238,26 +287,23 @@ local function createFirework()
     game.Debris:AddItem(part,2)
 end
 
--- Show text
 local appear = TweenService:Create(msg, TweenInfo.new(1.5, Enum.EasingStyle.Quad), {TextTransparency=0})
 appear:Play()
 appear.Completed:Wait()
 
--- Loạn màu + firework
 local startTime = tick()
 while tick()-startTime < 5 do
     msg.TextColor3 = Color3.fromRGB(math.random(0,255),math.random(180,255),math.random(200,255))
     createFirework()
-    task.wait(0.25) -- nhanh hơn để loạn màu
+    task.wait(0.25)
 end
 
--- Hide text
 local vanish = TweenService:Create(msg, TweenInfo.new(2, Enum.EasingStyle.Sine), {TextTransparency=1})
 vanish:Play()
 vanish.Completed:Wait()
 gui:Destroy()
 
--- ===== MAIN UI =====
+-- ===== MAIN UI WITH TOGGLE =====
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -275,13 +321,49 @@ local UICorner = Instance.new("UICorner")
 UICorner.Parent = ImageButton
 UICorner.CornerRadius = UDim.new(1,10)
 
+-- Store player avatar
+local playerAvatarUrl = "https://www.roblox.com/bust-thumbnails/image?userId=" .. player.UserId .. "&width=420&height=420&format=Png"
+
+local toggleConnection
+local menuVisible = true
+
 ImageButton.MouseButton1Down:Connect(function()
-    game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.End,false,game)
+    if menuVisible then
+        -- Hide menu and show avatar
+        menuVisible = false
+        if toggleConnection then
+            toggleConnection:Disconnect()
+        end
+        
+        -- Create avatar display
+        local avatarLabel = Instance.new("ImageLabel")
+        avatarLabel.Name = "PlayerAvatar"
+        avatarLabel.Parent = ScreenGui
+        avatarLabel.Position = UDim2.new(0.1, 0, 0.15, 0)
+        avatarLabel.Size = UDim2.new(0, 50, 0, 50)
+        avatarLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        avatarLabel.BorderSizePixel = 0
+        avatarLabel.Image = playerAvatarUrl
+        
+        local avatarCorner = Instance.new("UICorner")
+        avatarCorner.Parent = avatarLabel
+        avatarCorner.CornerRadius = UDim.new(1, 10)
+        
+        -- Click to toggle back
+        avatarLabel.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                avatarLabel:Destroy()
+                menuVisible = true
+                startRainbowEffect()
+            end
+        end)
+    end
 end)
 
 -- Load Fluent
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 repeat task.wait() until game:IsLoaded()
+
 local Window = Fluent:CreateWindow({
     Title="❤️ NVQ Roblox ❤️",
     SubTitle="Blox Fruit",
@@ -360,51 +442,40 @@ end})
 
 Tabs.Main2:AddButton({Title="HopBoss",Callback=function()
     repeat wait() until game:IsLoaded() and game.Players.LocalPlayer 
-    getgenv().team = "Pirates" -- Pirates or Marines
+    getgenv().team = "Pirates"
     loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/HopBoss.lua"))()
 end})
 
--- ===== CONTINUOUS COLOR CHANGE EFFECT =====
--- Rainbow colors array
+-- ===== RAINBOW EFFECT FOR MAIN MENU AND BUTTON =====
 local rainbowColorsUI = {
-    Color3.fromRGB(255, 0, 0),      -- Red
-    Color3.fromRGB(255, 127, 0),    -- Orange
-    Color3.fromRGB(255, 255, 0),    -- Yellow
-    Color3.fromRGB(0, 255, 0),      -- Green
-    Color3.fromRGB(0, 0, 255),      -- Blue
-    Color3.fromRGB(75, 0, 130),     -- Indigo
-    Color3.fromRGB(148, 0, 211)     -- Violet
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
 }
 
--- Flag để kiểm soát hiệu ứng
-local colorEffectActive = true
-
--- Spawn rainbow effect on ImageButton
-local rainbowConnection
-rainbowConnection = game:GetService("RunService").Heartbeat:Connect(function()
-    if colorEffectActive and ImageButton and ImageButton.Parent then
-        local colorIndex = math.floor(tick() / 0.2) % 7 + 1
-        ImageButton.ImageColor3 = rainbowColorsUI[colorIndex]
-    else
-        -- Tắt hiệu ứng nếu không còn hoạt động
-        if rainbowConnection then
-            rainbowConnection:Disconnect()
-        end
+local function startRainbowEffect()
+    if toggleConnection then
+        toggleConnection:Disconnect()
     end
-end)
-
--- Tắt hiệu ứng khi script khác được load
-local scriptStoppedTime = 0
-game:GetService("RunService").Heartbeat:Connect(function()
-    -- Kiểm tra nếu player load script khác (ví dụ: GUI của script khác xuất hiện)
-    -- Nếu cần, bạn có thể thêm điều kiện để phát hiện script khác đang chạy
-    if not colorEffectActive then
-        scriptStoppedTime = scriptStoppedTime + 1
-        if scriptStoppedTime > 300 then -- 5 giây không hoạt động
-            colorEffectActive = true
-            scriptStoppedTime = 0
+    
+    toggleConnection = RunService.Heartbeat:Connect(function()
+        if menuVisible and ImageButton and ImageButton.Parent then
+            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+            ImageButton.ImageColor3 = rainbowColorsUI[colorIndex]
+            
+            -- Rainbow effect on window
+            if Window.Root and Window.Root.Parent then
+                Window.Root.BorderColor3 = rainbowColorsUI[colorIndex]
+                Window.Root.BorderSizePixel = 2
+            end
         end
-    end
-end)
+    end)
+end
+
+startRainbowEffect()
 
 print("✓ Script loaded successfully! Enjoy!")
