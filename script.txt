@@ -328,6 +328,45 @@ local function createAvatarButton()
     return avatarContainer
 end
 
+-- ===== RAINBOW EFFECT FOR MAIN MENU =====
+local rainbowColorsUI = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+local function startRainbowEffect(window)
+    if toggleConnection then
+        toggleConnection:Disconnect()
+    end
+    
+    toggleConnection = RunService.Heartbeat:Connect(function()
+        if menuVisible and window and window.Root and window.Root.Parent then
+            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+            window.Root.BorderColor3 = rainbowColorsUI[colorIndex]
+            window.Root.BorderSizePixel = 3
+        end
+    end)
+end
+
+-- Rainbow effect on avatar border
+local function startAvatarRainbowEffect()
+    if toggleConnection then
+        toggleConnection:Disconnect()
+    end
+    
+    toggleConnection = RunService.Heartbeat:Connect(function()
+        if not menuVisible and avatarContainer and avatarContainer.Parent then
+            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+            avatarContainer.BorderColor3 = rainbowColorsUI[colorIndex]
+        end
+    end)
+end
+
 local function createMainWindow()
     -- Load Fluent
     local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -436,6 +475,7 @@ local function toggleMenu()
         end
         
         createAvatarButton()
+        setupAvatarClick()
         startAvatarRainbowEffect()
     else
         -- Show menu and hide avatar
@@ -449,7 +489,7 @@ local function toggleMenu()
             Window.Root.Visible = true
         end
         
-        startRainbowEffect()
+        startRainbowEffect(Window)
     end
 end
 
@@ -464,49 +504,8 @@ local function setupAvatarClick()
     end
 end
 
--- ===== RAINBOW EFFECT FOR MAIN MENU =====
-local rainbowColorsUI = {
-    Color3.fromRGB(255, 0, 0),
-    Color3.fromRGB(255, 127, 0),
-    Color3.fromRGB(255, 255, 0),
-    Color3.fromRGB(0, 255, 0),
-    Color3.fromRGB(0, 0, 255),
-    Color3.fromRGB(75, 0, 130),
-    Color3.fromRGB(148, 0, 211)
-}
-
-local function startRainbowEffect()
-    if toggleConnection then
-        toggleConnection:Disconnect()
-    end
-    
-    toggleConnection = RunService.Heartbeat:Connect(function()
-        if menuVisible and Window and Window.Root and Window.Root.Parent then
-            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
-            Window.Root.BorderColor3 = rainbowColorsUI[colorIndex]
-            Window.Root.BorderSizePixel = 3
-        end
-    end)
-end
-
--- Rainbow effect on avatar border
-local function startAvatarRainbowEffect()
-    if toggleConnection then
-        toggleConnection:Disconnect()
-    end
-    
-    toggleConnection = RunService.Heartbeat:Connect(function()
-        if not menuVisible and avatarContainer and avatarContainer.Parent then
-            local colorIndex = math.floor(tick() / 0.2) % 7 + 1
-            avatarContainer.BorderColor3 = rainbowColorsUI[colorIndex]
-        end
-    end)
-end
-
 repeat task.wait() until game:IsLoaded()
 Window = createMainWindow()
-createAvatarButton()
-setupAvatarClick()
-startRainbowEffect()
+startRainbowEffect(Window)
 
 print("✓ Script loaded successfully! Enjoy!")
