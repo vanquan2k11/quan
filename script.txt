@@ -445,12 +445,17 @@ local function createMainWindow()
     end})
 
     -- Tab 2 - SET AS DEFAULT
-    Tabs.Main2:AddButton({Title="tiki",Callback=function()
+    Tabs.Main2:AddButton({Title="Tekkit hub",Callback=function()
         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"))()
     end})
      
-    Tabs.Main2:AddButton({Title="gạt cần",Callback=function()
-        loadstring(game:HttpGet("https://pastefy.app/zLrwei0F/raw"))()
+    Tabs.Main2:AddButton({Title="Kira hub",Callback=function()
+        --[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OhhMyGehlee/Sol14/refs/heads/main/k"))()
+
+---Works In Solara and Other More Executors!!
     end})
 
     Tabs.Main2:AddButton({Title="HopBoss",Callback=function()
