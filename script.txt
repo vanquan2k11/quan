@@ -24,6 +24,21 @@ local UICornerKey = Instance.new("UICorner")
 UICornerKey.Parent = keyFrame
 UICornerKey.CornerRadius = UDim.new(0, 15)
 
+-- ===== BACKGROUND IMAGE =====
+local bgImage = Instance.new("ImageLabel")
+bgImage.Name = "Background"
+bgImage.Parent = keyFrame
+bgImage.Position = UDim2.new(0, 0, 0, 0)
+bgImage.Size = UDim2.new(1, 0, 1, 0)
+bgImage.BackgroundTransparency = 1
+bgImage.Image = "rbxassetid://125338466430995"
+bgImage.ZIndex = 0
+bgImage.ImageTransparency = 0.2
+
+local bgCorner = Instance.new("UICorner")
+bgCorner.Parent = bgImage
+bgCorner.CornerRadius = UDim.new(0, 15)
+
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Parent = keyFrame
 titleLabel.Position = UDim2.new(0, 0, 0, 10)
@@ -33,6 +48,7 @@ titleLabel.Text = "Key free"
 titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
 titleLabel.Font = Enum.Font.GothamBlack
 titleLabel.TextScaled = true
+titleLabel.ZIndex = 2
 
 local keyInput = Instance.new("TextBox")
 keyInput.Parent = keyFrame
@@ -48,6 +64,7 @@ keyInput.Font = Enum.Font.Gotham
 keyInput.TextSize = 18
 keyInput.TextWrapped = true
 keyInput.TextScaled = false
+keyInput.ZIndex = 2
 
 local UICornerInput = Instance.new("UICorner")
 UICornerInput.Parent = keyInput
@@ -63,6 +80,7 @@ submitBtn.Text = "Xác Nhận"
 submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 submitBtn.Font = Enum.Font.GothamBlack
 submitBtn.TextScaled = true
+submitBtn.ZIndex = 2
 
 local UICornerSubmit = Instance.new("UICorner")
 UICornerSubmit.Parent = submitBtn
@@ -78,6 +96,7 @@ closeBtn.Text = "Thoát"
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.Font = Enum.Font.GothamBlack
 closeBtn.TextScaled = true
+closeBtn.ZIndex = 2
 
 local UICornerClose = Instance.new("UICorner")
 UICornerClose.Parent = closeBtn
@@ -92,6 +111,7 @@ statusLabel.Text = ""
 statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextScaled = true
+statusLabel.ZIndex = 2
 
 submitBtn.MouseButton1Down:Connect(function()
     if keyInput.Text == correctKey then
