@@ -29,7 +29,7 @@ titleLabel.Parent = keyFrame
 titleLabel.Position = UDim2.new(0, 0, 0, 10)
 titleLabel.Size = UDim2.new(1, 0, 0, 40)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "❤️ NVQ Key Verification ❤️"
+titleLabel.Text = "Key free"
 titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
 titleLabel.Font = Enum.Font.GothamBlack
 titleLabel.TextScaled = true
@@ -124,7 +124,7 @@ repeat task.wait() until keyVerified
 
 -- ===== INTRO GUI =====
 local gui = Instance.new("ScreenGui")
-gui.Name = "VannQuann❤️"
+gui.Name = " VannQuann "
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
@@ -135,7 +135,7 @@ msg.AnchorPoint = Vector2.new(0.5,0.5)
 msg.Position = UDim2.new(0.5,0,0.5,0)
 msg.Size = UDim2.new(0,600,0,120)
 msg.BackgroundTransparency = 1
-msg.Text = "🥰 VannQuann Roblox 🥰"
+msg.Text = " VannQuann Roblox "
 msg.TextColor3 = Color3.fromRGB(0,255,255)
 msg.Font = Enum.Font.GothamBlack
 msg.TextScaled = true
