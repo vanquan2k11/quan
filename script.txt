@@ -296,38 +296,6 @@ local toggleConnection
 local menuVisible = true
 local avatarContainer = nil
 
--- Create avatar button with rainbow border
-local function createAvatarButton()
-    avatarContainer = Instance.new("Frame")
-    avatarContainer.Name = "AvatarContainer"
-    avatarContainer.Parent = ScreenGui
-    avatarContainer.Position = UDim2.new(0.1, 0, 0.15, 0)
-    avatarContainer.Size = UDim2.new(0, 80, 0, 80)
-    avatarContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    avatarContainer.BorderSizePixel = 3
-    avatarContainer.BorderColor3 = Color3.fromRGB(0, 255, 255)
-    
-    -- Corner radius for container
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = avatarContainer
-    
-    local avatarLabel = Instance.new("ImageLabel")
-    avatarLabel.Name = "PlayerAvatar"
-    avatarLabel.Parent = avatarContainer
-    avatarLabel.Position = UDim2.new(0, 0, 0, 0)
-    avatarLabel.Size = UDim2.new(1, 0, 1, 0)
-    avatarLabel.BackgroundTransparency = 1
-    avatarLabel.Image = playerAvatarUrl
-    
-    -- Make avatar circular
-    local avatarCorner = Instance.new("UICorner")
-    avatarCorner.CornerRadius = UDim.new(1, 0)
-    avatarCorner.Parent = avatarLabel
-    
-    return avatarContainer
-end
-
 -- ===== RAINBOW EFFECT FOR MAIN MENU =====
 local rainbowColorsUI = {
     Color3.fromRGB(255, 0, 0),
@@ -365,6 +333,45 @@ local function startAvatarRainbowEffect()
             avatarContainer.BorderColor3 = rainbowColorsUI[colorIndex]
         end
     end)
+end
+
+-- Create avatar button with rainbow border AND click handler
+local function createAvatarButton(toggleMenuFunc)
+    avatarContainer = Instance.new("Frame")
+    avatarContainer.Name = "AvatarContainer"
+    avatarContainer.Parent = ScreenGui
+    avatarContainer.Position = UDim2.new(0.1, 0, 0.15, 0)
+    avatarContainer.Size = UDim2.new(0, 80, 0, 80)
+    avatarContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    avatarContainer.BorderSizePixel = 3
+    avatarContainer.BorderColor3 = Color3.fromRGB(0, 255, 255)
+    
+    -- Corner radius for container
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = avatarContainer
+    
+    local avatarLabel = Instance.new("ImageLabel")
+    avatarLabel.Name = "PlayerAvatar"
+    avatarLabel.Parent = avatarContainer
+    avatarLabel.Position = UDim2.new(0, 0, 0, 0)
+    avatarLabel.Size = UDim2.new(1, 0, 1, 0)
+    avatarLabel.BackgroundTransparency = 1
+    avatarLabel.Image = playerAvatarUrl
+    
+    -- Make avatar circular
+    local avatarCorner = Instance.new("UICorner")
+    avatarCorner.CornerRadius = UDim.new(1, 0)
+    avatarCorner.Parent = avatarLabel
+    
+    -- ADD CLICK HANDLER IMMEDIATELY
+    avatarContainer.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            toggleMenuFunc()
+        end
+    end)
+    
+    return avatarContainer
 end
 
 local function createMainWindow()
@@ -474,8 +481,7 @@ local function toggleMenu()
             Window.Root.Visible = false
         end
         
-        createAvatarButton()
-        setupAvatarClick()
+        createAvatarButton(toggleMenu)
         startAvatarRainbowEffect()
     else
         -- Show menu and hide avatar
@@ -490,17 +496,6 @@ local function toggleMenu()
         end
         
         startRainbowEffect(Window)
-    end
-end
-
--- Avatar click handler
-local function setupAvatarClick()
-    if avatarContainer then
-        avatarContainer.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                toggleMenu()
-            end
-        end)
     end
 end
 
