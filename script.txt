@@ -3,7 +3,7 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
 -- ===== KEY VERIFICATION SYSTEM =====
-local correctKey = "1234"
+local correctKey = "Quỳnh"
 local keyVerified = false
 
 -- Create key verification GUI
@@ -234,7 +234,7 @@ end})
 
 Tabs.Main0:AddParagraph({
     Title = "Thông Tin",
-    Content = "Script đã được xác thực thành công!\nKey: 1234\nMỗi lần khởi động cần nhập key."
+    Content = "Script đã được xác thực thành công!\nKey: Quỳnh\nMỗi lần khởi động cần nhập key."
 })
 
 -- Tab 1
