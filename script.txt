@@ -2,7 +2,127 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
--- Intro GUI
+-- ===== KEY VERIFICATION SYSTEM =====
+local correctKey = "1234"
+local keyVerified = false
+
+-- Create key verification GUI
+local keyGui = Instance.new("ScreenGui")
+keyGui.Name = "KeyVerification"
+keyGui.Parent = game.CoreGui
+keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local keyFrame = Instance.new("Frame")
+keyFrame.Parent = keyGui
+keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+keyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+keyFrame.Size = UDim2.new(0, 400, 0, 200)
+keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+keyFrame.BorderSizePixel = 0
+
+local UICornerKey = Instance.new("UICorner")
+UICornerKey.Parent = keyFrame
+UICornerKey.CornerRadius = UDim.new(0, 15)
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Parent = keyFrame
+titleLabel.Position = UDim2.new(0, 0, 0, 10)
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "❤️ NVQ Key Verification ❤️"
+titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextScaled = true
+
+local keyInput = Instance.new("TextBox")
+keyInput.Parent = keyFrame
+keyInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+keyInput.Size = UDim2.new(0.8, 0, 0.35, 0)
+keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+keyInput.BorderSizePixel = 0
+keyInput.Text = ""
+keyInput.PlaceholderText = "Nhập key của bạn..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+keyInput.Font = Enum.Font.Gotham
+keyInput.TextSize = 18
+keyInput.TextWrapped = true
+keyInput.TextScaled = false
+
+local UICornerInput = Instance.new("UICorner")
+UICornerInput.Parent = keyInput
+UICornerInput.CornerRadius = UDim.new(0, 10)
+
+local submitBtn = Instance.new("TextButton")
+submitBtn.Parent = keyFrame
+submitBtn.Position = UDim2.new(0.1, 0, 0.8, 0)
+submitBtn.Size = UDim2.new(0.35, 0, 0.15, 0)
+submitBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+submitBtn.BorderSizePixel = 0
+submitBtn.Text = "Xác Nhận"
+submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitBtn.Font = Enum.Font.GothamBlack
+submitBtn.TextScaled = true
+
+local UICornerSubmit = Instance.new("UICorner")
+UICornerSubmit.Parent = submitBtn
+UICornerSubmit.CornerRadius = UDim.new(0, 10)
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = keyFrame
+closeBtn.Position = UDim2.new(0.55, 0, 0.8, 0)
+closeBtn.Size = UDim2.new(0.35, 0, 0.15, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "Thoát"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBlack
+closeBtn.TextScaled = true
+
+local UICornerClose = Instance.new("UICorner")
+UICornerClose.Parent = closeBtn
+UICornerClose.CornerRadius = UDim.new(0, 10)
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Parent = keyFrame
+statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+statusLabel.Size = UDim2.new(1, 0, 0, 20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextScaled = true
+
+submitBtn.MouseButton1Down:Connect(function()
+    if keyInput.Text == correctKey then
+        keyVerified = true
+        statusLabel.Text = "✓ Key chính xác!"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        task.wait(1)
+        keyGui:Destroy()
+    else
+        statusLabel.Text = "✗ Key không chính xác!"
+        keyInput.Text = ""
+        task.wait(2)
+        statusLabel.Text = ""
+    end
+end)
+
+closeBtn.MouseButton1Down:Connect(function()
+    keyGui:Destroy()
+    game:Shutdown()
+end)
+
+keyInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        submitBtn:FireEvent("MouseButton1Down")
+    end
+end)
+
+-- Wait for key verification
+repeat task.wait() until keyVerified
+
+-- ===== INTRO GUI =====
 local gui = Instance.new("ScreenGui")
 gui.Name = "VannQuann❤️"
 gui.IgnoreGuiInset = true
@@ -65,7 +185,7 @@ vanish:Play()
 vanish.Completed:Wait()
 gui:Destroy()
 
--- Main UI
+-- ===== MAIN UI =====
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -105,39 +225,47 @@ local Tabs = {
     Main1=Window:AddTab({Title="Script Blox fruit"}),
     Main2=Window:AddTab({Title="Hop sv"}),
 }
+
 -- Tab 0
-Tabs.Main0:AddButton({Title="Discord",Description="vannquann_85053  ",Callback=function() setclipboard("https://discord.gg/JZ9M7GJ5H") 
+Tabs.Main0:AddButton({Title="Discord",Description="vannquann_85053",Callback=function() 
+    setclipboard("https://discord.gg/JZ9M7GJ5H")
+    Fluent:Notify({Title = "Thành Công", Content = "Discord link đã được sao chép!", Duration = 2})
 end})
+
+Tabs.Main0:AddParagraph({
+    Title = "Thông Tin",
+    Content = "Script đã được xác thực thành công!\nKey: 1234\nMỗi lần khởi động cần nhập key."
+})
 
 -- Tab 1
 Tabs.Main1:AddButton({Title="GravityHub",Callback=function()
-   	   loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="AbacaxiHubOfc",Callback=function()
-   loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="OrangeHub",Callback=function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="KhaBanhHubV2",Callback=function()
-     loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/KhaBanhHubV2/refs/heads/main/obf_m92m5V2G0rk2XM6IPP1L1O701401kdJLV4V5nEyYclj029p00N3SyRWn7S1ax4Uz.lua.txt"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/KhaBanhHubV2/refs/heads/main/obf_m92m5V2G0rk2XM6IPP1L1O701401kdJLV4V5nEyYclj029p00N3SyRWn7S1ax4Uz.lua.txt"))()
 end})
 
 Tabs.Main1:AddButton({Title="AnDepZaiHubBeta",Callback=function()
-   loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="QuantumOnyx",Callback=function()
-     loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="Xeter v4",Callback=function()
     getgenv().Version = "V4"
-getgenv().Team = "Marines"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() 
+    getgenv().Team = "Marines"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))() 
 end})
 
 Tabs.Main1:AddButton({Title="BaconHub",Callback=function()
@@ -145,7 +273,7 @@ Tabs.Main1:AddButton({Title="BaconHub",Callback=function()
 end})
 
 Tabs.Main1:AddButton({Title="Vxezehub",Callback=function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/BF-Main.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/BF-Main.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="redzHub",Callback=function()
@@ -154,16 +282,18 @@ end})
 
 -- Tab 2
 Tabs.Main2:AddButton({Title="TEDDYHUB-FREEMIUM",Callback=function()
-   repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"))()
+    repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"))()
 end})
  
-Tabs.Main2:AddButton({Title="gạt cần ",Callback=function()
-   loadstring(game:HttpGet("https://pastefy.app/zLrwei0F/raw"))()
+Tabs.Main2:AddButton({Title="gạt cần",Callback=function()
+    loadstring(game:HttpGet("https://pastefy.app/zLrwei0F/raw"))()
 end})
 
 Tabs.Main2:AddButton({Title="HopBoss",Callback=function()
-repeat wait() until game:IsLoaded() and game.Players.LocalPlayer 
-getgenv().team = "Pirates" -- Pirates or Marines
-loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/HopBoss.lua"))()
+    repeat wait() until game:IsLoaded() and game.Players.LocalPlayer 
+    getgenv().team = "Pirates" -- Pirates or Marines
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/HopBoss.lua"))()
 end})
+
+print("✓ Script loaded successfully! Enjoy!")
