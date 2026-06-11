@@ -122,6 +122,58 @@ end)
 -- Wait for key verification
 repeat task.wait() until keyVerified
 
+-- ===== RAINBOW RAIN EFFECT AFTER KEY VERIFICATION =====
+local rainbowColors = {
+    Color3.fromRGB(255, 0, 0),      -- Red
+    Color3.fromRGB(255, 127, 0),    -- Orange
+    Color3.fromRGB(255, 255, 0),    -- Yellow
+    Color3.fromRGB(0, 255, 0),      -- Green
+    Color3.fromRGB(0, 0, 255),      -- Blue
+    Color3.fromRGB(75, 0, 130),     -- Indigo
+    Color3.fromRGB(148, 0, 211)     -- Violet
+}
+
+local function createRainDrop(colorIndex)
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local raindrop = Instance.new("Part")
+    raindrop.Anchored = true
+    raindrop.CanCollide = false
+    raindrop.Shape = Enum.PartType.Ball
+    raindrop.Size = Vector3.new(0.8, 0.8, 0.8)
+    raindrop.Color = rainbowColors[colorIndex]
+    raindrop.Material = Enum.Material.Neon
+    
+    local playerPos = player.Character.HumanoidRootPart.Position
+    local offsetX = math.random(-30, 30)
+    local offsetZ = math.random(-30, 30)
+    raindrop.Position = playerPos + Vector3.new(offsetX, 50, offsetZ)
+    
+    raindrop.Parent = workspace
+    
+    -- Tween the raindrop down
+    local tween = TweenService:Create(
+        raindrop,
+        TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
+        {Position = playerPos + Vector3.new(offsetX, -30, offsetZ)}
+    )
+    tween:Play()
+    
+    -- Remove after reaching bottom
+    game:GetService("Debris"):AddItem(raindrop, 3.5)
+end
+
+-- Rain effect - continuous for 8 seconds
+local rainStartTime = tick()
+local colorRotation = 1
+while tick() - rainStartTime < 8 do
+    for i = 1, 15 do -- Create 15 raindrops per cycle
+        createRainDrop(colorRotation)
+        colorRotation = colorRotation % 7 + 1
+    end
+    task.wait(0.15)
+end
+
 -- ===== INTRO GUI =====
 local gui = Instance.new("ScreenGui")
 gui.Name = " VannQuann "
