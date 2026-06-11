@@ -1,25 +1,154 @@
--- ===== VANNQUANN OBFUSCATED SCRIPT =====
-local _G_Players = game:GetService(("\80\108\97\121\101\114\115"):reverse())
-local _G_Tween = game:GetService(("\083\119\101\101\110"):reverse())
-local _G_Run = game:GetService(("\082\117\110\083\101\114\118\105\99\101"):reverse())
-local _G_player = _G_Players.LocalPlayer
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 
-local _KEY = "Quỳnh"
-local _VERIFIED = false
+-- ===== KEY VERIFICATION SYSTEM =====
+local correctKey = "Quỳnh"
+local keyVerified = false
 
--- Obfuscated GUI Creation
-local function _create_gui()
-    local _gui = Instance.new(("ScreenGui"):reverse())
-    _gui.Name = ("noitacifireVyeK"):reverse()
-    _gui.Parent = game.CoreGui
-    _gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    return _gui
-end
+-- Create key verification GUI
+local keyGui = Instance.new("ScreenGui")
+keyGui.Name = "KeyVerification"
+keyGui.Parent = game.CoreGui
+keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local _keyGui = _create_gui()
-local _keyFrame = Instance.new(("Frame"):reverse())
-_keyFrame.Parent = _keyGui
-_keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+local keyFrame = Instance.new("Frame")
+keyFrame.Parent = keyGui
+keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+keyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+keyFrame.Size = UDim2.new(0, 500, 0, 280)
+keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+keyFrame.BorderSizePixel = 2
+keyFrame.BorderColor3 = Color3.fromRGB(0, 255, 255)
+
+-- ===== BACKGROUND IMAGE =====
+local bgImage = Instance.new("ImageLabel")
+bgImage.Name = "Background"
+bgImage.Parent = keyFrame
+bgImage.Position = UDim2.new(0, 0, 0, 0)
+bgImage.Size = UDim2.new(1, 0, 1, 0)
+bgImage.BackgroundTransparency = 1
+bgImage.Image = "rbxassetid://125338466430995"
+bgImage.ZIndex = 0
+bgImage.ImageTransparency = 0.2
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Parent = keyFrame
+titleLabel.Position = UDim2.new(0, 0, 0, 15)
+titleLabel.Size = UDim2.new(1, 0, 0, 50)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Key free"
+titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextScaled = true
+titleLabel.ZIndex = 2
+
+local keyInput = Instance.new("TextBox")
+keyInput.Parent = keyFrame
+keyInput.Position = UDim2.new(0.05, 0, 0.35, 0)
+keyInput.Size = UDim2.new(0.9, 0, 0.4, 0)
+keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+keyInput.BorderSizePixel = 1
+keyInput.BorderColor3 = Color3.fromRGB(0, 255, 255)
+keyInput.Text = ""
+keyInput.PlaceholderText = "Nhập key của bạn..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+keyInput.Font = Enum.Font.Gotham
+keyInput.TextSize = 18
+keyInput.TextWrapped = true
+keyInput.TextScaled = false
+keyInput.ZIndex = 2
+
+local submitBtn = Instance.new("TextButton")
+submitBtn.Parent = keyFrame
+submitBtn.Position = UDim2.new(0.05, 0, 0.83, 0)
+submitBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
+submitBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+submitBtn.BorderSizePixel = 0
+submitBtn.Text = "Xác Nhận"
+submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitBtn.Font = Enum.Font.GothamBlack
+submitBtn.TextScaled = true
+submitBtn.ZIndex = 2
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = keyFrame
+closeBtn.Position = UDim2.new(0.55, 0, 0.83, 0)
+closeBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "Thoát"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBlack
+closeBtn.TextScaled = true
+closeBtn.ZIndex = 2
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Parent = keyFrame
+statusLabel.Position = UDim2.new(0, 0, 0.75, 0)
+statusLabel.Size = UDim2.new(1, 0, 0, 20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextScaled = true
+statusLabel.ZIndex = 2
+
+-- Rainbow colors for key frame
+local rainbowColorsKey = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+-- Rainbow effect on key frame border
+local keyFrameConnection
+keyFrameConnection = RunService.Heartbeat:Connect(function()
+    if keyFrame and keyFrame.Parent then
+        local colorIndex = math.floor(tick() / 0.3) % 7 + 1
+        keyFrame.BorderColor3 = rainbowColorsKey[colorIndex]
+    end
+end)
+
+-- Make key frame draggable
+local dragging = false
+local dragStart = Vector2.new(0, 0)
+
+keyFrame.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+    end
+end)
+
+keyFrame.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input, gameProcessed)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        keyFrame.Position = keyFrame.Position + UDim2.fromOffset(delta.X, delta.Y)
+        dragStart = input.Position
+    end
+end)
+
+submitBtn.MouseButton1Down:Connect(function()
+    if keyInput.Text == correctKey then
+        keyVerified = true
+        statusLabel.Text = "✓ Key chính xác!"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        task.wait(1)
+        -- ✓ FIX: Kiểm tra connection trước disconnect
+   _keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 _keyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 _keyFrame.Size = UDim2.new(0, 500, 0, 280)
 _keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
