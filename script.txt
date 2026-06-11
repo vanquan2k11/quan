@@ -379,7 +379,7 @@ local function createMainWindow()
     local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
     
     local Window = Fluent:CreateWindow({
-        Title="❤️ NVQ Roblox ❤️",
+        Title=" VanQuan ",
         SubTitle="Blox Fruit",
         TabWidth=157,
         Size=UDim2.fromOffset(450,300),
