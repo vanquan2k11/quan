@@ -364,4 +364,47 @@ Tabs.Main2:AddButton({Title="HopBoss",Callback=function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/HopBoss.lua"))()
 end})
 
+-- ===== CONTINUOUS COLOR CHANGE EFFECT =====
+-- Rainbow colors array
+local rainbowColorsUI = {
+    Color3.fromRGB(255, 0, 0),      -- Red
+    Color3.fromRGB(255, 127, 0),    -- Orange
+    Color3.fromRGB(255, 255, 0),    -- Yellow
+    Color3.fromRGB(0, 255, 0),      -- Green
+    Color3.fromRGB(0, 0, 255),      -- Blue
+    Color3.fromRGB(75, 0, 130),     -- Indigo
+    Color3.fromRGB(148, 0, 211)     -- Violet
+}
+
+-- Flag để kiểm soát hiệu ứng
+local colorEffectActive = true
+
+-- Spawn rainbow effect on ImageButton
+local rainbowConnection
+rainbowConnection = game:GetService("RunService").Heartbeat:Connect(function()
+    if colorEffectActive and ImageButton and ImageButton.Parent then
+        local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+        ImageButton.ImageColor3 = rainbowColorsUI[colorIndex]
+    else
+        -- Tắt hiệu ứng nếu không còn hoạt động
+        if rainbowConnection then
+            rainbowConnection:Disconnect()
+        end
+    end
+end)
+
+-- Tắt hiệu ứng khi script khác được load
+local scriptStoppedTime = 0
+game:GetService("RunService").Heartbeat:Connect(function()
+    -- Kiểm tra nếu player load script khác (ví dụ: GUI của script khác xuất hiện)
+    -- Nếu cần, bạn có thể thêm điều kiện để phát hiện script khác đang chạy
+    if not colorEffectActive then
+        scriptStoppedTime = scriptStoppedTime + 1
+        if scriptStoppedTime > 300 then -- 5 giây không hoạt động
+            colorEffectActive = true
+            scriptStoppedTime = 0
+        end
+    end
+end)
+
 print("✓ Script loaded successfully! Enjoy!")
