@@ -147,6 +147,603 @@ submitBtn.MouseButton1Down:Connect(function()
         statusLabel.Text = "✓ Key chính xác!"
         statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
         task.wait(1)
+        -- ✓ FIX: Kiểm tra connection trước disconnect
+        if keyFrameConnection then
+            keyFrameConnection:Disconnect()
+            keyFrameConnection = nil
+        end
+        -- ✓ FIX: Kiểm tra GUI trước destroy
+        if keyGui and keyGui.Parent then
+            keyGui:Destroy()
+        end
+    else
+        statusLabel.Text = "✗ Key không chính xác!"
+        keyInput.Text = ""
+        task.wait(2)
+        statusLabel.Text = ""
+    end
+end)
+
+closeBtn.MouseButton1Down:Connect(function()
+    if keyFrameConnection then
+        keyFrameConnection:Disconnect()
+        keyFrameConnection = nil
+    end
+    if keyGui and keyGui.Parent then
+        keyGui:Destroy()
+    end
+    game:Shutdown()
+end)
+
+keyInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        submitBtn:FireEvent("MouseButton1Down")
+    end
+end)
+
+-- Wait for key verification
+repeat task.wait() until keyVerified
+
+-- ===== RAINBOW RAIN EFFECT AFTER KEY VERIFICATION =====
+local rainbowColors = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+local function createRainDrop(colorIndex)
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local raindrop = Instance.new("Part")
+    raindrop.Anchored = true
+    raindrop.CanCollide = false
+    raindrop.Shape = Enum.PartType.Ball
+    raindrop.Size = Vector3.new(0.8, 0.8, 0.8)
+    raindrop.Color = rainbowColors[colorIndex]
+    raindrop.Material = Enum.Material.Neon
+    
+    local playerPos = player.Character.HumanoidRootPart.Position
+    local offsetX = math.random(-30, 30)
+    local offsetZ = math.random(-30, 30)
+    raindrop.Position = playerPos + Vector3.new(offsetX, 50, offsetZ)
+    
+    raindrop.Parent = workspace
+    
+    local tween = TweenService:Create(
+        raindrop,
+        TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
+        {Position = playerPos + Vector3.new(offsetX, -30, offsetZ)}
+    )
+    tween:Play()
+    
+    game:GetService("Debris"):AddItem(raindrop, 3.5)
+end
+
+local rainStartTime = tick()
+local colorRotation = 1
+while tick() - rainStartTime < 8 do
+    for i = 1, 15 do
+        createRainDrop(colorRotation)
+        colorRotation = colorRotation % 7 + 1
+    end
+    task.wait(0.15)
+end
+
+-- ===== INTRO GUI =====
+local gui = Instance.new("ScreenGui")
+gui.Name = " VannQuann "
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local msg = Instance.new("TextLabel")
+msg.Parent = gui
+msg.AnchorPoint = Vector2.new(0.5, 0.5)
+msg.Position = UDim2.new(0.5, 0, 0.5, 0)
+msg.Size = UDim2.new(0, 600, 0, 120)
+msg.BackgroundTransparency = 1
+msg.Text = " VannQuann Roblox "
+msg.TextColor3 = Color3.fromRGB(0, 255, 255)
+msg.Font = Enum.Font.GothamBlack
+msg.TextScaled = true
+msg.TextStrokeTransparency = 0
+msg.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+msg.TextTransparency = 1
+
+local function createFirework()
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    local part = Instance.new("Part")
+    part.Anchored = true
+    part.CanCollide = false
+    part.Size = Vector3.new(0.5, 0.5, 0.5)
+    part.Position = player.Character.HumanoidRootPart.Position + Vector3.new(math.random(-10, 10), math.random(5, 15), math.random(-10, 10))
+    part.Transparency = 1
+    part.Parent = workspace
+
+    local firework = Instance.new("ParticleEmitter")
+    firework.Texture = "rbxassetid://243660364"
+    firework.Rate = 50
+    firework.Lifetime = NumberRange.new(1)
+    firework.Speed = NumberRange.new(10)
+    firework.SpreadAngle = Vector2.new(360, 360)
+    firework.Color = ColorSequence.new(Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255)))
+    firework.Parent = part
+
+    game.Debris:AddItem(part, 2)
+end
+
+local appear = TweenService:Create(msg, TweenInfo.new(1.5, Enum.EasingStyle.Quad), {TextTransparency = 0})
+appear:Play()
+appear.Completed:Wait()
+
+local startTime = tick()
+while tick() - startTime < 5 do
+    msg.TextColor3 = Color3.fromRGB(math.random(0, 255), math.random(180, 255), math.random(200, 255))
+    createFirework()
+    task.wait(0.25)
+end
+
+local vanish = TweenService:Create(msg, TweenInfo.new(2, Enum.EasingStyle.Sine), {TextTransparency = 1})
+vanish:Play()
+vanish.Completed:Wait()
+if gui and gui.Parent then
+    gui:Destroy()
+end
+
+-- ===== MAIN UI WITH TOGGLE (FIXED & IMPROVED) =====
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Store player avatar
+local playerAvatarUrl = "https://www.roblox.com/bust-thumbnails/image?userId=" .. player.UserId .. "&width=420&height=420&format=Png"
+
+local rainbowColorsUI = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+-- ===== MENU STATE MANAGEMENT =====
+local menuState = {
+    visible = true,
+    window = nil,
+    avatarContainer = nil,
+    rainbowConnection = nil,
+    windowConnections = {}
+}
+
+local function stopRainbowEffect()
+    if menuState.rainbowConnection then
+        pcall(function()
+            menuState.rainbowConnection:Disconnect()
+        end)
+        menuState.rainbowConnection = nil
+    end
+end
+
+local function cleanupWindowConnections()
+    for _, connection in ipairs(menuState.windowConnections) do
+        pcall(function()
+            connection:Disconnect()
+        end)
+    end
+    menuState.windowConnections = {}
+end
+
+local function startWindowRainbowEffect()
+    stopRainbowEffect()
+    
+    menuState.rainbowConnection = RunService.Heartbeat:Connect(function()
+        if menuState.visible and menuState.window and menuState.window.Root and menuState.window.Root.Parent then
+            pcall(function()
+                local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+                menuState.window.Root.BorderColor3 = rainbowColorsUI[colorIndex]
+                menuState.window.Root.BorderSizePixel = 3
+            end)
+        end
+    end)
+end
+
+local function startAvatarRainbowEffect()
+    stopRainbowEffect()
+    
+    menuState.rainbowConnection = RunService.Heartbeat:Connect(function()
+        if not menuState.visible and menuState.avatarContainer and menuState.avatarContainer.Parent then
+            pcall(function()
+                local colorIndex = math.floor(tick() / 0.2) % 7 + 1
+                menuState.avatarContainer.BorderColor3 = rainbowColorsUI[colorIndex]
+            end)
+        end
+    end)
+end
+
+local function createAvatarButton()
+    -- Destroy existing avatar if any
+    if menuState.avatarContainer and menuState.avatarContainer.Parent then
+        pcall(function()
+            menuState.avatarContainer:Destroy()
+        end)
+    end
+    
+    menuState.avatarContainer = Instance.new("Frame")
+    menuState.avatarContainer.Name = "AvatarButton"
+    menuState.avatarContainer.Parent = ScreenGui
+    menuState.avatarContainer.Position = UDim2.new(0.02, 0, 0.15, 0)
+    menuState.avatarContainer.Size = UDim2.new(0, 80, 0, 80)
+    menuState.avatarContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    menuState.avatarContainer.BorderSizePixel = 3
+    menuState.avatarContainer.BorderColor3 = Color3.fromRGB(0, 255, 255)
+    menuState.avatarContainer.Visible = true
+    
+    -- Corner radius for container
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = menuState.avatarContainer
+    
+    local avatarLabel = Instance.new("ImageLabel")
+    avatarLabel.Name = "PlayerAvatar"
+    avatarLabel.Parent = menuState.avatarContainer
+    avatarLabel.Position = UDim2.new(0, 0, 0, 0)
+    avatarLabel.Size = UDim2.new(1, 0, 1, 0)
+    avatarLabel.BackgroundTransparency = 1
+    avatarLabel.Image = playerAvatarUrl
+    avatarLabel.ZIndex = 2
+    
+    -- Make avatar circular
+    local avatarCorner = Instance.new("UICorner")
+    avatarCorner.CornerRadius = UDim.new(1, 0)
+    avatarCorner.Parent = avatarLabel
+    
+    -- ✓ FIX: Setup avatar click handler with proper error handling
+    local avatarConnection = menuState.avatarContainer.InputBegan:Connect(function(input, gameProcessed)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            toggleMenu()
+        end
+    end)
+    
+    table.insert(menuState.windowConnections, avatarConnection)
+end
+
+local function showMenu()
+    menuState.visible = true
+    
+    -- Hide avatar
+    if menuState.avatarContainer and menuState.avatarContainer.Parent then
+        menuState.avatarContainer.Visible = false
+    end
+    
+    -- Show window
+    if menuState.window and menuState.window.Root then
+        menuState.window.Root.Visible = true
+    end
+    
+    startWindowRainbowEffect()
+end
+
+local function hideMenu()
+    menuState.visible = false
+    
+    -- Create and show avatar
+    createAvatarButton()
+    startAvatarRainbowEffect()
+    
+    -- Hide window
+    if menuState.window and menuState.window.Root then
+        menuState.window.Root.Visible = false
+    end
+end
+
+-- ✓ FIX: Toggle function with better logic
+local function toggleMenu()
+    if menuState.visible then
+        hideMenu()
+    else
+        showMenu()
+    end
+end
+
+local function createMainWindow()
+    -- ✓ FIX: Error handling for Fluent loading
+    local success, Fluent = pcall(function()
+        return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+    end)
+    
+    if not success or not Fluent then
+        warn("❌ Không thể tải Fluent UI!")
+        return nil
+    end
+    
+    local Window = Fluent:CreateWindow({
+        Title = "❤️ NVQ Roblox ❤️",
+        SubTitle = "Blox Fruit",
+        TabWidth = 157,
+        Size = UDim2.fromOffset(500, 350),
+        Acrylic = true,
+        Theme = "Light",
+        MinimizeKey = Enum.KeyCode.End
+    })
+
+    local Tabs = {
+        Main0 = Window:AddTab({Title = "Thông Tin"}),
+        Main1 = Window:AddTab({Title = "Script Blox"}),
+        Main2 = Window:AddTab({Title = "Hop Server"}),
+    }
+
+    -- Tab 0: Information
+    Tabs.Main0:AddButton({
+        Title = "Discord",
+        Description = "vannquann_85053",
+        Callback = function() 
+            setclipboard("https://discord.gg/JZ9M7GJ5H")
+            Fluent:Notify({
+                Title = "✓ Thành Công", 
+                Content = "Discord link đã được sao chép!", 
+                Duration = 2
+            })
+        end
+    })
+
+    Tabs.Main0:AddParagraph({
+        Title = "Thông Tin",
+        Content = "✓ Script đã được xác thực thành công!\n✓ Key: Quỳnh\n✓ Nhấn avatar để ẩn/hiện menu\n✓ Nhấn End để giảu thiểu cửa sổ"
+    })
+
+    -- Tab 1: Scripts Blox Fruit
+    Tabs.Main1:AddButton({
+        Title = "GravityHub",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "AbacaxiHubOfc",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "KhaBanhHubV2",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/KhaBanhHubV2/refs/heads/main/obf_m92m5V2G0rk2XM6IPP1L1O701401kdJLV4V5nEyYclj029p00N3SyRWn7S1ax4Uz.lua.txt"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "AnDepZaiHubBeta",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "QuantumOnyx",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "Xeter v4",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                getgenv().Version = "V4"
+                getgenv().Team = "Marines"
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "BaconHub",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "Vxezehub",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/BF-Main.lua"))()
+            end)
+        end
+    })
+
+    Tabs.Main1:AddButton({
+        Title = "redzHub",
+        Description = "Script Blox Fruit",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))()
+            end)
+        end
+    })
+
+    -- Tab 2: Server Hop
+    Tabs.Main2:AddButton({
+        Title = "TEDDYHUB-FREEMIUM",
+        Description = "Server Hopper",
+        Callback = function()
+            pcall(function()
+                repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"))()
+            end)
+        end
+    })
+     
+    Tabs.Main2:AddButton({
+        Title = "Gạt Cần",
+        Description = "Server Hopper",
+        Callback = function()
+            pcall(function()
+                loadstring(game:HttpGet("https://pastefy.app/zLrwei0F/raw"))()
+            end)
+        end
+    })
+
+    Tabs.Main2:AddButton({
+        Title = "HopBoss",
+        Description = "Server Hopper",
+        Callback = function()
+            pcall(function()
+                repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer 
+                getg
+-- ===== BACKGROUND IMAGE =====
+local bgImage = Instance.new("ImageLabel")
+bgImage.Name = "Background"
+bgImage.Parent = keyFrame
+bgImage.Position = UDim2.new(0, 0, 0, 0)
+bgImage.Size = UDim2.new(1, 0, 1, 0)
+bgImage.BackgroundTransparency = 1
+bgImage.Image = "rbxassetid://125338466430995"
+bgImage.ZIndex = 0
+bgImage.ImageTransparency = 0.2
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Parent = keyFrame
+titleLabel.Position = UDim2.new(0, 0, 0, 15)
+titleLabel.Size = UDim2.new(1, 0, 0, 50)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Key free"
+titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextScaled = true
+titleLabel.ZIndex = 2
+
+local keyInput = Instance.new("TextBox")
+keyInput.Parent = keyFrame
+keyInput.Position = UDim2.new(0.05, 0, 0.35, 0)
+keyInput.Size = UDim2.new(0.9, 0, 0.4, 0)
+keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+keyInput.BorderSizePixel = 1
+keyInput.BorderColor3 = Color3.fromRGB(0, 255, 255)
+keyInput.Text = ""
+keyInput.PlaceholderText = "Nhập key của bạn..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+keyInput.Font = Enum.Font.Gotham
+keyInput.TextSize = 18
+keyInput.TextWrapped = true
+keyInput.TextScaled = false
+keyInput.ZIndex = 2
+
+local submitBtn = Instance.new("TextButton")
+submitBtn.Parent = keyFrame
+submitBtn.Position = UDim2.new(0.05, 0, 0.83, 0)
+submitBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
+submitBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+submitBtn.BorderSizePixel = 0
+submitBtn.Text = "Xác Nhận"
+submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitBtn.Font = Enum.Font.GothamBlack
+submitBtn.TextScaled = true
+submitBtn.ZIndex = 2
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = keyFrame
+closeBtn.Position = UDim2.new(0.55, 0, 0.83, 0)
+closeBtn.Size = UDim2.new(0.4, 0, 0.12, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "Thoát"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBlack
+closeBtn.TextScaled = true
+closeBtn.ZIndex = 2
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Parent = keyFrame
+statusLabel.Position = UDim2.new(0, 0, 0.75, 0)
+statusLabel.Size = UDim2.new(1, 0, 0, 20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextScaled = true
+statusLabel.ZIndex = 2
+
+-- Rainbow colors for key frame
+local rainbowColorsKey = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(148, 0, 211)
+}
+
+-- Rainbow effect on key frame border
+local keyFrameConnection
+keyFrameConnection = RunService.Heartbeat:Connect(function()
+    if keyFrame and keyFrame.Parent then
+        local colorIndex = math.floor(tick() / 0.3) % 7 + 1
+        keyFrame.BorderColor3 = rainbowColorsKey[colorIndex]
+    end
+end)
+
+-- Make key frame draggable
+local dragging = false
+local dragStart = Vector2.new(0, 0)
+
+keyFrame.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+    end
+end)
+
+keyFrame.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input, gameProcessed)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        keyFrame.Position = keyFrame.Position + UDim2.fromOffset(delta.X, delta.Y)
+        dragStart = input.Position
+    end
+end)
+
+submitBtn.MouseButton1Down:Connect(function()
+    if keyInput.Text == correctKey then
+        keyVerified = true
+        statusLabel.Text = "✓ Key chính xác!"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        task.wait(1)
         if keyFrameConnection then
             keyFrameConnection:Disconnect()
         end
