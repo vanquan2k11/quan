@@ -391,7 +391,7 @@ local function createMainWindow()
     local Tabs = {
         Main0=Window:AddTab({Title="Thông Tin"}),
         Main1=Window:AddTab({Title="Script Blox fruit"}),
-        Main2=Window:AddTab({Title="Hop sv"}),
+        Main2=Window:AddTab({Title=" Attack on Titan"}),
     }
 
     -- Tab 0
@@ -445,9 +445,8 @@ local function createMainWindow()
     end})
 
     -- Tab 2 - SET AS DEFAULT
-    Tabs.Main2:AddButton({Title="TEDDYHUB-FREEMIUM",Callback=function()
-        repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"))()
+    Tabs.Main2:AddButton({Title="tiki",Callback=function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"))()
     end})
      
     Tabs.Main2:AddButton({Title="gạt cần",Callback=function()
