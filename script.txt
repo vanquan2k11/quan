@@ -249,7 +249,7 @@ ImageButton.BorderSizePixel = 0
 ImageButton.Position = UDim2.new(0.1,0,0.15,0)
 ImageButton.Size = UDim2.new(0,40,0,40)
 ImageButton.Draggable = true
-ImageButton.Image = "http://www.roblox.com/asset/?id=113483373930943"
+ImageButton.Image = "http://www.roblox.com/asset/?id=133962905796881"
 
 local UICorner = Instance.new("UICorner")
 UICorner.Parent = ImageButton
@@ -296,10 +296,6 @@ end})
 
 Tabs.Main1:AddButton({Title="AbacaxiHubOfc",Callback=function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()
-end})
-
-Tabs.Main1:AddButton({Title="OrangeHub",Callback=function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"))()
 end})
 
 Tabs.Main1:AddButton({Title="KhaBanhHubV2",Callback=function()
